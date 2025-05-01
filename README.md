@@ -41,7 +41,7 @@ Start the application using docker:
 make run
 ```
 
-Or fastpi:
+Or running locally with a virtualenv and fastapi:
 ```bash
 fastapi run main.py
 ```
@@ -55,11 +55,16 @@ This executes the FastAPI application with hot-reloading enabled for development
 - SQLModel for ORM capabilities, combining SQLAlchemy Core and Pydantic
 - Automatic table creation at application startup
 - Efficient data validation and type safety
+- Currently using SQLite for simplicity, but can be configured for other databases such as MySQL or PostgreSQL
 
 ### Authentication
 - JWT-based authentication using PyJWT
 - Secure password hashing
 - Token-based session management
+#### Improvements:
+- Implement refresh tokens for better session management
+- Add throttling in the application or API gateway to prevent abuse
+- Implement user roles and permissions for more granular access control
 
 ### WebSocket Implementation
 WebSockets provide real-time, bidirectional communication channels between clients and the server:
@@ -67,7 +72,7 @@ WebSockets provide real-time, bidirectional communication channels between clien
 - Reduced overhead compared to HTTP polling
 - Efficient handling of streaming responses from language models
 
-### LangChain Integration
+### LangChain Integration creating a LLM service
 LangChain enhances the AI capabilities of the application:
 - Contextual conversation chains maintain state between messages
 - Abstract interface to various language models
