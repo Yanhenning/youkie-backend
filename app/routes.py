@@ -1,12 +1,16 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
+from fastapi import HTTPException
 from starlette.responses import StreamingResponse
 from starlette.websockets import WebSocket
 import json
 
 from app.enums import SummarizationStyle
 from app.services.llm_service import LlmService
+
+
+active_connections = {}
 
 router = APIRouter(
     prefix="/api",
@@ -15,8 +19,6 @@ router = APIRouter(
 )
 
 log = logging.getLogger(__name__)
-
-active_connections = {}
 
 
 @router.get("/health")
