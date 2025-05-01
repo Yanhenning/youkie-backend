@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database.database import create_db_and_tables
 from app.routes import router
 from app.users.routes import auth_router
+from settings import settings
 
 
 @asynccontextmanager
@@ -24,10 +25,12 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8000",
+    "https://youkie-frontend.vercel.app/",
     "ws://localhost",
     "ws://localhost:3000",
     "ws://localhost:8000",
     "ws://127.0.0.1:8000",
+    settings.production_url,
 ]
 
 app.add_middleware(
