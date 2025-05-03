@@ -11,4 +11,4 @@ services:
       - .:/app
     environment:
       - FAST_API_APP=run.py
-      - FAST_API__ENV=development
+      - FAST_API_ENV=development
