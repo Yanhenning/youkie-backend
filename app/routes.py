@@ -1,14 +1,17 @@
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, status
 from fastapi import HTTPException
 from starlette.responses import StreamingResponse
 from starlette.websockets import WebSocket
 import json
+from sqlmodel import Session
 
+from app.database.database import get_session
 from app.enums import SummarizationStyle
 from app.services.llm_service import LlmService
-
+from app.security.auth import get_current_user, websocket_auth
+from app.users.models import User
 
 active_connections = {}
 
@@ -26,10 +29,20 @@ async def health_check():
     return {"status": "healthy"}
 
 
+@router.get("/test")
+async def test_endpoint(current_user: User = Depends(get_current_user)):
+    return {
+        "message": "Your endpoint is authenticated",
+        "user_id": current_user.id,
+        "email": current_user.email
+    }
+
+
 @router.get("/stream_summarize_text")
 async def stream_summarize_text(
     content: str,
     style: SummarizationStyle = SummarizationStyle.NORMAL,
+    current_user: User = Depends(get_current_user)
 ):
     try:
         service = LlmService(streaming=True)
@@ -41,11 +54,17 @@ async def stream_summarize_text(
         raise HTTPException(status_code=500, detail=f"Failed to summarize text via streaming: {str(e)}")
 
 @router.websocket("/ws/summarize_stream")
-async def websocket_summarize_stream(websocket: WebSocket):
+async def websocket_summarize_stream(websocket: WebSocket, session: Session = Depends(get_session)):
+    user = await websocket_auth.authenticate(websocket, session)
+    if not user:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
     await websocket.accept()
+
     connection_id = id(websocket)
     service = LlmService(streaming=True)
-    active_connections[connection_id] = {"websocket": websocket, "service": service}
+    active_connections[connection_id] = {"websocket": websocket, "service": service, "user": user}
 
     try:
         while True:

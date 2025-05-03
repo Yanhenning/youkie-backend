@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     app_name: str = "Youkie"
     sqlalchemy_database_url: str
     production_url: str
+    jwt_algorithm: str = "HS256"
 
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -19,4 +20,5 @@ settings = Settings(
     secret_key=os.getenv("SECRET_KEY"),
     sqlalchemy_database_url=os.getenv("SQLALCHEMY_DATABASE_URL", ""),
     production_url=os.getenv("PRODUCTION_URL", ""),
+    jwt_algorithm=os.getenv("JWT_ALGORITHM", "HS256")
 )
